@@ -67,6 +67,12 @@ class percona::install {
             default => $::percona::pkg_compat,
           }
         }
+        '5.6': {
+          $pkg_compat = $::percona::pkg_compat ? {
+            undef   => 'Percona-Server-shared-compat',
+            default => $::percona::pkg_compat,
+          }
+        }
         default: {
           $pkg_compat = $::percona::pkg_compat ? {
             undef   => 'Percona-SQL-shared-compat',

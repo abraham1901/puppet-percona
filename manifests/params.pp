@@ -89,6 +89,7 @@ class percona::params (
   $mgmt_cnf          = undef,
 
   $default_configuration  = {
+    '5.6'    => {},
     '5.5'    => {},
     '5.1'    => {},
     'global' => {},
