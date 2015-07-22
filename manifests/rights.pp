@@ -97,7 +97,7 @@ define percona::rights (
     fail('You must either provide the password hash to use or a plaintext password')
   }
   if $user == undef and $default_user == undef {
-    fail('You must define the user parameter or use proper formatting in the name: "user@host/database"')
+    fail("You must define the user parameter or use proper formatting in the name: \"user@host/database\", name: ${name} user: ${user}, default_user: $default_user")
   }
   if $host == undef and $default_host == undef {
     fail('You must define the host parameter or use proper formatting in the name: "user@host/database"')
