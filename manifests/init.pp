@@ -77,6 +77,18 @@ class percona (
   $config_replace   = $percona::params::config_replace,
   $config_include_dir = $::percona::params::config_include_dir,
   $server           = $percona::params::server,
+  $cluster          = $percona::params::cluster,
+  $cluster_index    = $percona::params::cluster_index,
+  $cluster_address   = $percona::params::cluster_address,
+  $cluster_node_name = $percona::params::cluster_node_name,
+  $cluster_name      = $percona::params::cluster_name,
+  $cluster_replication_user     = $percona::params::cluster_replication_user,
+  $cluster_replication_password = $percona::params::cluster_replication_password,
+  $cluster_slave_threads        = $percona::params::cluster_slave_threads,
+  $cluster_sst_method           = $percona::params::cluster_sst_method,
+  $cluster_wsrep_provider       = $percona::params::cluster_wsrep_provider,
+  $cluster_node_address         = $percona::params::cluster_node_address,
+  $cluster_notify_cmd           = $percona::params::cluster_notify_cmd,
   $service_enable   = $percona::params::service_enable,
   $service_ensure   = $percona::params::service_ensure,
   $service_name     = $percona::params::service_name,
@@ -112,8 +124,8 @@ class percona (
   $config_file      = $percona::params::_config_file,
 
 ) inherits percona::params {
+  include percona::cluster
 
-  $config_include_dir_default = $::percona::params::config_include_dir_default
   $config_includedir = $config_include_dir ? {
     undef   => $config_include_dir_default,
     default => $config_include_dir,
@@ -121,6 +133,17 @@ class percona (
 
   $sanitized_servername = regsubst($::percona::servername,'\.','-','G')
 
+  if ( $cluster ) {
+    if ( !$server ) {
+      fail("Percona cluster without server!")
+    }
+    if ( !$cluster_index or !cluster_name or !$cluster_node_name ) {
+      fail("Percona cluster needs cluster_index (my.cnf:server_id), cluster_name (my.cnf:wsrep_cluster_name), and cluster_node_name (my.cnf:wsrep_node_name)!")
+    }
+    if ( !$cluster_replication_user or !$cluster_replication_password ) {
+      fail("Percona cluster needs cluster_replication_user and cluster_replication_password (my.cnf:wsrep_sst_auth=user:password)!")
+    }
+  }
 
   ## Translate settings in params in a hash.
   $params = {
@@ -142,6 +165,7 @@ class percona (
       'xtrabackup/datadir'               => $::percona::datadir,
       'xtrabackup/target_dir'            => $::percona::targetdir,
     },
+    'cluster'                            => $::percona::cluster::params,
   }
 
   include percona::preinstall
@@ -149,6 +173,7 @@ class percona (
   include percona::config
   include percona::service
 
+  Class['percona::cluster'] ->
   Class['percona::preinstall'] ->
   Class['percona::install'] ->
   Class['percona::config'] ->

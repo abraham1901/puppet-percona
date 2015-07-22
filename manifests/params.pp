@@ -58,6 +58,17 @@ class percona::params (
   $service_ensure    = 'running',
   $service_name      = 'mysql',
   $service_restart   = true,
+  $cluster           = false,
+  $cluster_index     = undef,
+  $cluster_address   = 'gcomm://',
+  $cluster_node_name = $fqdn,
+  $cluster_name      = undef,
+  $cluster_replication_user = undef,
+  $cluster_replication_password = undef,
+  $cluster_slave_threads = 2,
+  $cluster_sst_method = 'xtrabackup',
+  $cluster_node_address = false,
+  $cluster_notify_cmd   = false,
   $daemon_group      = 'mysql',
   $daemon_user       = 'mysql',
   $tmpdir            = undef,
@@ -114,4 +125,10 @@ class percona::params (
     default => $config_file,
   }
 
+  $cluster_wsrep_provider = '/usr/lib/libgalera_smm.so'
+
+#  $cluster_wsrep_provider = $::hardwareisa ? {
+#    'x86_64' => '/usr/lib64/libgalera_smm.so',
+#    default  => '/usr/lib/libgalera_smm.so',
+#  }
 }
